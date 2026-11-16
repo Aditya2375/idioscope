@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="Frozen PCA factors, residual AR1 fits and a forward signal audit on six invented assets."
+    />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <meta name="referrer" content="no-referrer" />
+    <title>idioscope - after the common move</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script type="module" src="src/app.js"></script>
+  </head>
+  <body>
+    <a class="skip" href="#controls">Skip to controls</a>
+    <header>
+      <a class="brand" href="#">idioscope <span>/ 24</span></a
+      ><span>PCA / RESIDUAL / FORWARD AUDIT</span>
+    </header>
+    <main>
+      <section class="hero">
+        <p class="eyebrow">SIX INVENTED ASSETS / 200 SYNTHETIC DAYS</p>
+        <div class="intro">
+          <h1>After the<br />common move.</h1>
+          <p>
+            Remove the shared factors. Inspect what remains. Freeze the fit
+            before following a residual forward.
+          </p>
+        </div>
+        <form id="controls" novalidate>
+          <div class="inputs">
+            <label
+              >Retained PCA factors / 1 to 4<input
+                id="factors"
+                type="number"
+                min="1"
+                max="4"
+                step="1"
+                value="2"
+                required /></label
+            ><label
+              >Training days / 80 to 160<input
+                id="training"
+                type="number"
+                min="80"
+                max="160"
+                step="1"
+                value="120"
+                required /></label
+            ><label
+              >Synthetic seed / 1 to 9999<input
+                id="seed"
+                type="number"
+                min="1"
+                max="9999"
+                step="1"
+                value="17"
+                required
+            /></label>
+          </div>
+          <button type="submit">
+            Freeze a new fit <span aria-hidden="true">↗</span>
+          </button>
+          <p id="status" role="status" aria-live="polite"></p>
+        </form>
+        <p class="callout">
+          Synthetic data deliberately contains mean reversion. This is a PCA
+          statistical-arbitrage mechanism lab, not evidence of a real trading
+          edge. No prices, PnL, allocation, orders or performance statistics are
+          produced.
+        </p>
+      </section>
+      <section class="metrics">
+        <div>
+          <span>Training variance explained</span
+          ><strong id="explained"></strong>
+        </div>
+        <div>
+          <span>AR(1) fits in OU domain</span><strong id="eligible"></strong>
+        </div>
+        <div>
+          <span>Frozen training boundary</span><strong id="boundary"></strong>
+        </div>
+        <div>
+          <span>Held-out observations</span><strong id="heldout"></strong>
+        </div>
+      </section>
+      <section>
+        <div class="section-title">
+          <h2>01 / What the factors remove.</h2>
+          <span>Training-only correlation PCA</span>
+        </div>
+        <p>
+          Means, sample scales, eigenvectors and AR(1) coefficients use training
+          days only. They remain fixed for every held-out day. Retaining more
+          factors removes more training variation, not necessarily more risk.
+        </p>
+        <div
+          id="spectrum"
+          class="spectrum"
+          role="img"
+          aria-label="Six training correlation eigenvalues and retained factor shares"
+        ></div>
+        <p class="caption">
+          Each bar is its share of the six-asset correlation trace. Retained
+          components are teal. Eigenvector signs are arbitrary; the projector
+          and residuals are sign-invariant.
+        </p>
+      </section>
+      <section>
+        <div class="section-title">
+          <h2>02 / Follow one residual.</h2>
+          <span>Only the held-out period is plotted</span>
+        </div>
+        <div class="inspect">
+          <label
+            >Invented asset / 1 to 6<input
+              id="asset"
+              type="number"
+              min="1"
+              max="6"
+              step="1"
+              value="1" /></label
+          ><label
+            >Inspect held-out day<input
+              id="day"
+              type="number"
+              step="1"
+              value="150"
+          /></label>
+        </div>
+        <p
+          id="selection"
+          class="selection"
+          role="status"
+          aria-live="polite"
+        ></p>
+        <div class="legend">
+          <span class="teal">━ Close s-score</span
+          ><span>┄ Entry ±1.25 / exit ±0.5</span
+          ><span class="plum">│ Inspected day</span>
+        </div>
+        <svg
+          id="timeline"
+          role="img"
+          aria-label="Held-out residual s-scores with fixed entry and exit thresholds"
+        ></svg>
+        <p class="caption">
+          The score uses the frozen training equilibrium mean and standard
+          deviation. It is a model deviation, not a p-value or a stationarity
+          test. The synthetic path can drift away from the training fit.
+        </p>
+        <div class="explain">
+          <div>
+            <h3>The frozen fit</h3>
+            <dl id="fit-audit"></dl>
+          </div>
+          <div>
+            <h3>The day audit</h3>
+            <dl id="day-audit"></dl>
+          </div>
+        </div>
+        <p class="callout">
+          Day d's hypothetical state uses only the score at close d - 1. The
+          first held-out day is forced flat. The close score at d is shown for
+          the next decision, never used retroactively.
+        </p>
+      </section>
+      <section>
+        <div class="section-title">
+          <h2>03 / Open the residual basket.</h2>
+          <span>Frozen raw-return coefficients, not trade sizes</span>
+        </div>
+        <p>
+          For the selected asset i, the diagnostic basket is wⱼ = δᵢⱼ -
+          σᵢPᵢⱼ/σⱼ. Its centered return equals that asset's PCA residual. These
+          are unnormalized coefficients, not dollar allocations. Factor exposure
+          is zero only in the retained, fitted PC geometry.
+        </p>
+        <div id="weights" class="weights"></div>
+        <p id="weight-audit" class="caption"></p>
+        <p class="callout">
+          No dollar neutrality or out-of-sample economic beta neutrality is
+          promised. The mean offset is separate: residual = Σwⱼrⱼ - Σwⱼμⱼ. No
+          hedge execution, gross scaling, borrow constraint or transaction-cost
+          model is applied.
+        </p>
+      </section>
+      <section>
+        <div class="section-title">
+          <h2>04 / Keep the causal trail.</h2>
+          <span>Selected asset / every held-out day</span>
+        </div>
+        <p class="caption">
+          This supplemental table scrolls horizontally and vertically.
+          Previous-close score determines the day's state. Flat does not mean
+          safe; +1 and -1 mean hypothetical long and short residual states, not
+          orders.
+        </p>
+        <div
+          class="table-scroll"
+          tabindex="0"
+          role="region"
+          aria-label="Forward residual signal audit"
+        >
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Day</th>
+                <th scope="col">Residual return</th>
+                <th scope="col">Cumulative level</th>
+                <th scope="col">Previous score</th>
+                <th scope="col">State</th>
+                <th scope="col">Close score</th>
+              </tr>
+            </thead>
+            <tbody id="ledger"></tbody>
+          </table>
+        </div>
+      </section>
+      <section class="limitations">
+        <div>
+          <h3>A fitted bridge.</h3>
+          <p>
+            Training residuals are demeaned, so their cumulative path starts and
+            ends near zero by construction. This fitted bridge can favor
+            apparent reversion. AR(1) eligibility is a parameter-domain check,
+            not proof of stationarity, cointegration or profitability.
+          </p>
+        </div>
+        <div>
+          <h3>A narrow OU mapping.</h3>
+          <p>
+            Fit Xₜ₊₁ = a + bXₜ + e on training transitions. Only 0 &lt; b &lt; 1
+            with positive innovation variance maps to the continuous-time
+            mean-reverting OU model used here. Other fits stay flat. No
+            coefficient clipping or fallback fit is used.
+          </p>
+        </div>
+        <div>
+          <h3>A frozen experiment.</h3>
+          <p>
+            This is not the rolling empirical strategy in Avellaneda and Lee. No
+            calibration, data cleaning, costs, risk controls or live deployment
+            are demonstrated. Changing the seed or factor count is not a search
+            for a profitable setting. Native Safari/Android untested.
+          </p>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <p>
+        Background:
+        <a
+          href="https://math.nyu.edu/inmemoriam/avellaneda/AvellanedaLeeStatArb20090616.pdf"
+          >Avellaneda &amp; Lee</a
+        >
+        ·
+        <a
+          href="https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html"
+          >PCA centering and scaling</a
+        >
+        ·
+        <a
+          href="https://www.itl.nist.gov/div898/handbook/pmc/section4/pmc442.htm"
+          >stationarity</a
+        >
+      </p>
+      <p>idioscope / Java core + local browser mirror</p>
+      <p>
+        MIT OR Apache-2.0 · No accounts, uploads, storage or runtime network
+        calls
+      </p>
+    </footer>
+  </body>
+</html>
